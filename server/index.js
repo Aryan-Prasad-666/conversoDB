@@ -74,10 +74,10 @@ const trainNLPModel = async () => {
   manager.addAnswer('en', 'greeting', 'Hi there! What can I do for you?');
 
   // adding new bills 
-  manager.addDocument("en", "add a new bill", "add.bill");
-  manager.addDocument("en", "save a new bill", "add.bill");
-  manager.addDocument("en", "create a new bill", "add.bill");
-manager.addAnswer("en", "add.bill", "Please provide the bill details in the format: [CustomerID], [TotalAmount], [PaymentStatus]");
+  manager.addDocument("en", "add a new bill for [Customer Name], [TotalAmount], [PaymentStatus]");
+  manager.addDocument("en", "save a new bill for", "add.bill");
+  manager.addDocument("en", "create a new bill for", "add.bill");
+manager.addAnswer("en", "add.bill", "Please provide the bill details in the format: [CustomerName], [TotalAmount], [PaymentStatus]");
 
   // display bills 
   manager.addDocument("en", "display bills", "get.bills");
@@ -86,15 +86,15 @@ manager.addAnswer("en", "add.bill", "Please provide the bill details in the form
   manager.addAnswer("en", "get.bills", "Fetching your latest bills...");
 
   //to get customer details
-  manager.addDocument("en", "get customer details", "get.customer");
-manager.addDocument("en", "show me customer details", "get.customer");
+  manager.addDocument("en", "get customer details of [name]", "get.customer");
+manager.addDocument("en", "show me customer details of [name]", "get.customer");
 manager.addAnswer("en", "get.customer", "Fetching customer details...");
 
 // to add  new customer
 manager.addDocument("en", "add a new customer", "add.customer");
 manager.addDocument("en", "create a new customer", "add.customer");
 manager.addDocument("en", "save customer details", "add.customer");
-manager.addAnswer("en", "add.customer", "Please provide the customer details in the format: [CustomerName], [Email (optional)], [Phone]");
+manager.addAnswer("en", "add.customer", "Please provide the customer details in the format: [CustomerName], [Phone]");
 
 // to update phone
 manager.addDocument("en", "update phone for [CustomerName], [NewPhone]", "update.customer.phone");

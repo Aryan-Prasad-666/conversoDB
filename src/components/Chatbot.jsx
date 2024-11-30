@@ -49,10 +49,29 @@ const Chatbot = () => {
     };
   };
 
-  const handleButtonClick = async (presetText) => {
-    addChatMessage("user", presetText);
-    await sendMessage(presetText); 
+  const displayBills = () => {
+    addChatMessage("bot", "To view latest bills say \"display bills\" or \"Show me bills\" or anything similar.");
   };
+
+  const addCustomer = () => {
+    addChatMessage("bot", "Format: \"Add a new customer: [CustomerName], [Phone]\"");
+  }
+
+  const displayCustomers = () => {
+    addChatMessage("bot", "Format: \"get customer details of [name]\"");
+  }
+
+  const updatePhone = () => {
+    addChatMessage("bot", "Format: \"update phone for [CustomerName], [NewPhone]\"");
+  }
+
+  const addBill = () =>{
+    addChatMessage("bot", "Format: \"Add a bill for [CustomerName], [TotalAmount], [PaymentStatus]\"");
+  }
+
+  const viewOldBills = () => {
+    addChatMessage("bot", "To view bills of a particular date you can select a day from the calender on the left.");
+  }
 
   const handleInputChange = (e) => {
     setChatInput(e.target.value);
@@ -103,14 +122,14 @@ const Chatbot = () => {
       <div className="chatbot-body">
         <div className="buttons-container">
           <div className="options-panel">
-            <h3>Quick Options:</h3>
-            <button onClick={() => handleButtonClick("Display Bills")}>Display Bills</button>
-            <button onClick={() => handleButtonClick("Add Item")}>Add Item</button>
-            <button onClick={() => handleButtonClick("Get User Details")}>Get User Details</button>
-            <button onClick={() => handleButtonClick("Update Item")}>Update Item</button>
-            <button onClick={() => handleButtonClick("Delete Item")}>Delete Item</button>
+            <h3>Need Help?</h3>
+            <button onClick={displayBills}>Display Bills</button>
+            <button onClick={addCustomer}>Add Customer</button>
+            <button onClick={displayCustomers}>Display Customer</button>
+            <button onClick={updatePhone}>Update Phone</button>
+            <button onClick={addBill}>Add a New Bill</button>
             <button onClick={() => handleButtonClick("Search Item")}>Search Item</button>
-            <button onClick={() => handleButtonClick("Help")}>Help</button>
+            <button onClick={viewOldBills}>View Old Bills</button>
           </div>
 
           {/* Calendar Section */}
