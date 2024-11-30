@@ -73,6 +73,10 @@ const Chatbot = () => {
     addChatMessage("bot", "To view bills of a particular date you can select a day from the calender on the left.");
   }
 
+  const deleteBill = ()=>{
+    addChatMessage("bot", "Format: \"delete bill with id [BillID]\"");
+  }
+
   const handleInputChange = (e) => {
     setChatInput(e.target.value);
   };
@@ -128,7 +132,7 @@ const Chatbot = () => {
             <button onClick={displayCustomers}>Display Customer</button>
             <button onClick={updatePhone}>Update Phone</button>
             <button onClick={addBill}>Add a New Bill</button>
-            <button onClick={() => handleButtonClick("Search Item")}>Search Item</button>
+            <button onClick={deleteBill}>Delete Bill</button>
             <button onClick={viewOldBills}>View Old Bills</button>
           </div>
 
