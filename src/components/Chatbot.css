@@ -6,11 +6,15 @@
   }
   
   .chatbot-header {
-    background-color: #4a90e2;
+    background-color: #ffffff;
     color: white;
     padding: 11px;
     text-align: center;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .chatbot-header h1{
+    color: white;
   }
   
   .chatbot-body {
