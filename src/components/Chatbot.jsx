@@ -1,29 +1,28 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./Chatbot.css";
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css"; // Import the default styles for DatePicker
-import axios from "axios"; // Import axios for HTTP requests
+import "react-datepicker/dist/react-datepicker.css"; 
+import axios from "axios"; 
 import Navbar from "./Navbar";
 
-// For voice-to-text
+
+// speech recognition
 const SpeechRecognition =
   window.SpeechRecognition || window.webkitSpeechRecognition;
 
 const Chatbot = () => {
   const [chatInput, setChatInput] = useState("");
   const [chatLog, setChatLog] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(null); // Store the selected date
-  const [isListening, setIsListening] = useState(false); // For voice input state
-  const chatEndRef = useRef(null); // Reference to the bottom of the chat area
+  const [selectedDate, setSelectedDate] = useState(null); 
+  const [isListening, setIsListening] = useState(false); 
+  const chatEndRef = useRef(null); 
 
   const recognition = SpeechRecognition ? new SpeechRecognition() : null;
 
-  // Scroll to the bottom of the chat area whenever chatLog updates
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatLog]);
 
-  // Handle voice input
   const handleStartVoiceInput = () => {
     if (!recognition) {
       addChatMessage("bot", "Voice recognition is not supported on this browser.");
@@ -52,7 +51,7 @@ const Chatbot = () => {
 
   const handleButtonClick = async (presetText) => {
     addChatMessage("user", presetText);
-    await sendMessage(presetText); // Automatically send the message
+    await sendMessage(presetText); 
   };
 
   const handleInputChange = (e) => {
@@ -62,22 +61,18 @@ const Chatbot = () => {
   const handleSendMessage = async () => {
     if (chatInput.trim() === "") return;
 
-    // Add the user's message to the chat log
     addChatMessage("user", chatInput);
     await sendMessage(chatInput);
 
-    // Clear the input after sending the message
     setChatInput("");
   };
 
   const sendMessage = async (message) => {
     try {
-      // Send the user's message to the backend
       const response = await axios.post("http://localhost:5000/chat", {
         message,
       });
 
-      // Get the response message from the backend and display it in the chat log
       const botMessage = response.data.message;
       addChatMessage("bot", botMessage);
     } catch (error) {
@@ -90,11 +85,10 @@ const Chatbot = () => {
     setChatLog((prevLog) => [...prevLog, { sender, message }]);
   };
 
-  // Function to handle date selection
   const handleDateChange = (date) => {
     setSelectedDate(date);
     const formattedDate = date ? date.toLocaleDateString() : "";
-    const message = `Show me bills for ${formattedDate}`;
+    const message = `Show me bills of ${formattedDate}`;
     addChatMessage("user", message);
     sendMessage(message);
   };
@@ -121,7 +115,7 @@ const Chatbot = () => {
 
           {/* Calendar Section */}
           <div className="calendar-section">
-            <h3>Select a Date:</h3>
+            <h3>Select a date to view older bills:</h3>
             <DatePicker
               selected={selectedDate}
               onChange={handleDateChange}
@@ -138,7 +132,7 @@ const Chatbot = () => {
               <div
                 key={index}
                 className={`chat-message ${chat.sender === "user" ? "user" : "bot"}`}
-                dangerouslySetInnerHTML={{ __html: chat.message }} // Render HTML content
+                dangerouslySetInnerHTML={{ __html: chat.message }}
               />
             ))}
             <div ref={chatEndRef}></div> {/* Invisible element to scroll into view */}

@@ -82,6 +82,7 @@ manager.addAnswer("en", "add.bill", "Please provide the bill details in the form
   // display bills 
   manager.addDocument("en", "display bills", "get.bills");
   manager.addDocument("en", "show me bills", "get.bills");
+  manager.addDocument("en", "display latest bills", "get.bills");
   manager.addAnswer("en", "get.bills", "Fetching your latest bills...");
 
   //to get customer details
@@ -101,6 +102,17 @@ manager.addDocument("en", "change phone for [CustomerName], [NewPhone]", "update
 manager.addDocument("en", "modify contact info for [CustomerName], [NewPhone]", "update.customer.phone");
 manager.addAnswer("en", "update.customer.phone", "Updating the phone number...");
 
+//to view bills of a particular date
+manager.addDocument("en", "show me the bills for [Date]", "get.bills.by.date");
+manager.addDocument("en", "display the bills of [Date]", "get.bills.by.date");
+manager.addDocument("en", "fetch the bills for [Date]", "get.bills.by.date");
+manager.addDocument("en", "get bills dated [Date]", "get.bills.by.date");
+manager.addDocument("en", "bills from [Date]", "get.bills.by.date");
+manager.addAnswer("en", "get.bills.by.date", "Fetching bills for the specified date...");
+
+
+
+
   
 
   await manager.train();
@@ -117,20 +129,27 @@ app.post("/chat", async (req, res) => {
 
   try {
     if (response.intent === "get.bills") {
+      const dateMatch = userMessage.match(/\b(\d{1,2}\/\d{1,2}\/\d{4})\b/);
+      if (dateMatch) {
+        response.intent = "get.bills.by.date"; 
+      }
+    }
+
+    if (response.intent === "get.bills") {
       const [rows] = await db.query(`
-      SELECT 
-        Bills.BillID,
-        Customers.Name AS CustomerName,
-        Bills.TotalAmount,
-        Bills.BillDate
-      FROM 
-        Bills
-      JOIN 
-        Customers
-      ON 
-        Bills.CustomerID = Customers.CustomerID
-      LIMIT 10
-    `);
+        SELECT 
+          Bills.BillID,
+          Customers.Name AS CustomerName,
+          Bills.TotalAmount,
+          Bills.BillDate
+        FROM 
+          Bills
+        JOIN 
+          Customers
+        ON 
+          Bills.CustomerID = Customers.CustomerID
+        LIMIT 10
+      `);
       botMessage = formatBillsTable(rows);
     } else if (response.intent === "get.customer") {
       botMessage = await getCustomerDetails(userMessage);
@@ -140,6 +159,8 @@ app.post("/chat", async (req, res) => {
       botMessage = response.answer || "Hello! How can I assist you today?";
     } else if (response.intent === "add.bill") {
       botMessage = await addBill(userMessage);
+    } else if (response.intent === "get.bills.by.date") {
+      botMessage = await getBillsByDate(userMessage);
     } else if (response.intent === "add.customer") {
       botMessage = await addCustomer(userMessage);
     } else {
@@ -365,6 +386,78 @@ const updateCustomerPhone = async (userMessage) => {
     return "An error occurred while updating the phone number. Please try again.";
   }
 };
+
+const getBillsByDate = async (userMessage) => {
+  try {
+    const match = userMessage.match(/of\s+(\d{1,2}\/\d{1,2}\/\d{4})/i);
+
+    if (!match) {
+      return "Please provide a valid date in the format: DD/MM/YYYY.";
+    }
+
+    const [_, dateString] = match;
+    const [day, month, year] = dateString.split("/").map((part) => parseInt(part, 10));
+    const queryDate = new Date(year, month - 1, day);
+
+    if (isNaN(queryDate)) {
+      return "The provided date is invalid. Please use the format DD/MM/YYYY.";
+    }
+
+    const [rows] = await db.query(
+      `
+      SELECT 
+        Bills.BillID,
+        Customers.Name AS CustomerName,
+        Bills.TotalAmount,
+        Bills.BillDate
+      FROM 
+        Bills
+      JOIN 
+        Customers
+      ON 
+        Bills.CustomerID = Customers.CustomerID
+      WHERE 
+        DATE(Bills.BillDate) = DATE(?)
+      `,
+      [queryDate]
+    );
+
+    if (rows.length === 0) {
+      return `No bills were found for the date ${dateString}.`;
+    }
+
+    let table = `
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr>
+            <th>Bill ID</th>
+            <th>Customer Name</th>
+            <th>Amount</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    rows.forEach((bill) => {
+      table += `
+        <tr>
+          <td>${bill.BillID}</td>
+          <td>${bill.CustomerName}</td>
+          <td>${bill.TotalAmount}</td>
+          <td>${new Date(bill.BillDate).toLocaleString()}</td>
+        </tr>
+      `;
+    });
+
+    table += `</tbody></table>`;
+    return `Here are the bills of ${dateString}:<br>${table}`;
+  } catch (error) {
+    console.error("Error fetching bills by date:", error);
+    return "An error occurred while fetching bills. Please try again.";
+  }
+};
+
 
 
 
