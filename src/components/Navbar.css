@@ -1,32 +1,32 @@
 .navbar {
-  height: 5rem; /* Slightly taller navbar */
+  height: 5rem; 
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 60px; /* Reduced vertical padding, kept horizontal padding */
+  padding: 10px 60px; 
   background: rgba(179, 202, 219, 0.8);
-  backdrop-filter: blur(12px); /* Frosted glass effect */
+  backdrop-filter: blur(12px); 
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
   position: fixed;
   width: 100%;
   top: 0;
-  z-index: 10; /* Ensure it's above the Spline background */
-  border-bottom: 3px solid #187aaf; /* Slightly thicker border */
+  z-index: 10; 
+  border-bottom: 3px solid #187aaf;
 }
 
 .navbar-logo h2 {
-  font-size: 2.5rem; /* Larger logo font size */
+  font-size: 2.5rem; 
   font-weight: bold;
   color: #3d4f61;
   text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
   animation: slideInFromLeft 1s ease-out;
-  margin: 0; /* Removes unnecessary margins */
-  line-height: 1; /* Fixes any extra spacing issues */
+  margin: 0; 
+  line-height: 1;
 }
 
 .navbar-links {
   display: flex;
-  gap: 30px; /* Increased gap between links */
+  gap: 30px; 
   list-style: none;
   margin-bottom: 0;
 }
@@ -34,9 +34,9 @@
 .nav-link {
   color: #0a0646;
   text-decoration: none;
-  font-size: 1.2rem; /* Slightly larger font size for links */
-  font-weight: 600; /* Slightly bolder text */
-  letter-spacing: 1.2px; /* Wider letter spacing */
+  font-size: 1.2rem; 
+  font-weight: 600; 
+  letter-spacing: 1.2px;
   transition: color 0.3s ease, transform 0.3s ease;
 }
 
