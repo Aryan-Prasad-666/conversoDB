@@ -55,8 +55,8 @@ const Settings = () => {
               className="settings-select"
             >
               <option value="English">English</option>
-              <option value="Spanish">Spanish</option>
-              <option value="French">French</option>
+              <option value="Spanish">Kannada</option>
+              <option value="French">Hindi</option>
             </select>
           </div>
           <button className="btn-save">Save Changes</button>

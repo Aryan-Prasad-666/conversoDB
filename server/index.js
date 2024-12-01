@@ -41,6 +41,14 @@ const initializeTables = async () => {
         PaymentStatus VARCHAR(250),
         FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
     )
+    `,
+    `
+    CREATE TABLE IF NOT EXISTS Stocks (
+        StockID INT AUTO_INCREMENT PRIMARY KEY,
+        ProductName VARCHAR(250),
+        Quantity INT,
+        Price DECIMAL(10, 2)
+    )
     `
   ];
 
@@ -116,6 +124,59 @@ manager.addAnswer("en", "add.bill", "Please provide the bill details in the form
   manager.addDocument("en", "delete the bill ID [BillID]", "delete.bill");
   manager.addAnswer("en", "delete.bill", "Deleting the bill...");
 
+  // Add new stock
+  manager.addDocument("en", "add stock for ", "add.stock");
+  manager.addDocument("en", "add stock for pens", "add.stock");
+manager.addDocument("en", "add stock for items", "add.stock");
+manager.addDocument("en", "add stock for {item}", "add.stock");
+manager.addDocument("en", "add a new batch of {item}","add.stock");
+  manager.addDocument("en", "create new stock for ", "add.stock");
+  manager.addAnswer("en", "add.stock", "Please provide stock details in the format: [ProductName], [Quantity], [Price]");
+
+  // Display stock
+  manager.addDocument("en", "get all stocks", "get.stocks");
+  manager.addDocument("en", "show me all the stocks", "get.stocks");
+  manager.addDocument("en", "show me the stocks", "get.stocks");
+  manager.addDocument("en", "display all the stocks of shop", "get.stocks");
+  manager.addDocument("en", "display stocks", "get.stocks");
+  manager.addAnswer("en", "get.stocks", "Fetching stock details...");
+
+  // Update stock
+  manager.addDocument("en", "update stock  for ", "update.stock");
+  manager.addDocument("en", "change stock for ", "update.stock");
+  manager.addDocument("en", "change stock of ", "update.stock");
+  manager.addDocument("en", "update stock of ", "update.stock");
+  manager.addDocument("en", "update stock price of ", "update.stock");
+  manager.addDocument("en", "update stock quantity of ", "update.stock");
+  manager.addAnswer("en", "update.stock", "Updating stock details...");
+
+  // Delete stock
+  manager.addDocument("en", "delete stock for ", "delete.stock");
+  manager.addDocument("en", "delete stock of ", "delete.stock");
+  manager.addDocument("en", "remove stock for ", "delete.stock");
+  manager.addDocument("en", "remove stock of ", "delete.stock");
+  manager.addAnswer("en", "delete.stock", "Deleting stock...");
+
+  // chnage price
+  manager.addDocument('en', 'change price for * to *', 'change.price');
+manager.addDocument('en', 'update price for * to *', 'change.price');
+manager.addDocument('en', 'set price for * to *', 'change.price');
+manager.addDocument('en', 'change price of * to *', 'change.price');
+manager.addDocument('en', 'update price of * to *', 'change.price');
+manager.addDocument('en', 'set price of * to *', 'change.price');
+manager.addDocument('en', 'change the price of * to *', 'change.price');
+
+//add more quantity or increase stock
+manager.addDocument('en', 'add quantity for * by *', 'add.quantity');
+manager.addDocument('en', 'increase quantity for * by *', 'add.quantity');
+manager.addDocument('en', 'add stock for * by *', 'add.quantity');
+manager.addDocument('en', 'add stock of * by *', 'add.quantity');
+manager.addDocument('en', 'increase stock for * by *', 'add.quantity');
+manager.addDocument('en', 'increase stock of * by *', 'add.quantity');
+manager.addDocument('en', 'add more quantity for * by *', 'add.quantity');
+manager.addDocument('en', 'add more quantity of * by *', 'add.quantity');
+
+
 
 
   
@@ -170,7 +231,19 @@ app.post("/chat", async (req, res) => {
       botMessage = await addCustomer(userMessage);
     } else if (response.intent === "delete.bill") {
       botMessage = await deleteBill(userMessage);
-    }else {
+    } else if (response.intent === "add.stock") {
+      botMessage = await addStock(userMessage);
+    } else if (response.intent === "get.stocks") {
+      botMessage = await getStocks();
+    } else if (response.intent === "update.stock") {
+      botMessage = await updateStock(userMessage);
+    } else if (response.intent === "delete.stock") {
+      botMessage = await deleteStock(userMessage);
+    } else if (response.intent === "change.price") {
+      botMessage = await changePrice(userMessage);
+    } else if (response.intent === "add.quantity") {
+      botMessage = await addQuantity(userMessage);
+    } else {
       botMessage = "Sorry, I didn't understand that. Can you please clarify your request?";
     }
   } catch (error) {
@@ -493,7 +566,238 @@ const addBill = async (userMessage) => {
   };
 
 
+  //stock related functions
+const addStock = async (userMessage) => {
+    try {
+      let sanitizedMessage = userMessage.replace(/\s*comma\s*/gi, ',').replace(/[.!?]/g, '');
+  
+      const match = sanitizedMessage.match(/for\s+([\w\s]+?)[,\s]+(\d+)[,\s]+(\d+(\.\d+)?)/i);
+  
+      if (!match) {
+        return "Please provide stock details in the format: Add stock for [ProductName], [Quantity], [Price]";
+      }
+  
+      const [_, productName, quantityRaw, priceRaw] = match;
+      const quantity = parseInt(quantityRaw);
+      const price = parseFloat(priceRaw);
+  
+      if (isNaN(quantity) || isNaN(price)) {
+        return "Quantity and Price must be numeric.";
+      }
 
+      const [existingProduct] = await db.query(
+        `SELECT * FROM Stocks WHERE ProductName = ?`,
+        [productName.trim()]
+    );
+
+    if (existingProduct.length > 0) {
+        return `The product "${productName}" is already present in the stock. Use update stock if you want to update quantity or price`;
+    }
+  
+      const [result] = await db.query(
+        `INSERT INTO Stocks (ProductName, Quantity, Price) VALUES (?, ?, ?)`,
+        [productName.trim(), quantity, price]
+      );
+  
+      if (result.affectedRows > 0) {
+        return `New stock added successfully! Product: ${productName}`;
+      } else {
+        return "Failed to add the stock. Please try again.";
+      }
+    } catch (error) {
+      console.error("Error adding stock:", error);
+      return "An error occurred while adding the stock. Please try again.";
+  }
+};
+
+const getStocks = async () => {
+  try {
+    const [rows] = await db.query(
+      `SELECT StockID, ProductName, Quantity, Price FROM Stocks`
+    );
+
+    if (rows.length === 0) {
+      return "There is no stock of any product present in your shop.";
+    }
+
+    let table = `
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr>
+            <th>Stock ID</th>
+            <th>Product Name</th>
+            <th>Quantity</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    rows.forEach((stock) => {
+      table += `
+        <tr>
+          <td>${stock.StockID}</td>
+          <td>${stock.ProductName}</td>
+          <td>${stock.Quantity}</td>
+          <td>${stock.Price}</td>
+        </tr>
+      `;
+    });
+
+    table += `</tbody></table>`;
+    return `Here are the stock details:<br>${table}`;
+  } catch (error) {
+    console.error("Error fetching stock details:", error);
+    return "An error occurred while fetching stock details. Please try again.";
+  }
+};
+
+const updateStock = async (userMessage) => {
+  try {
+    let sanitizedMessage = userMessage.replace(/\s*comma\s*/gi, ',').replace(/[.!?-]/g, '');
+
+    const match = sanitizedMessage.match(/\b(?:for|of)\s+([\w\s]+?)[,\s]+(\d+)[,\s]+(\d+(\.\d+)?)/i);
+
+    if (!match) {
+      return "Please provide the details in the format: Update stock for [ProductName], [NewQuantity], [NewPrice].";
+    }
+
+    const [_, productName, quantityRaw, priceRaw] = match;
+    const quantity = parseInt(quantityRaw);
+    const price = parseFloat(priceRaw);
+
+    if (isNaN(quantity) || isNaN(price)) {
+      return "Quantity and Price must be numeric.";
+    }
+
+    const [result] = await db.query(
+      `UPDATE Stocks SET Quantity = ?, Price = ? WHERE ProductName = ?`,
+      [quantity, price, productName.trim()]
+    );
+
+    if (result.affectedRows > 0) {
+      return `Stock updated successfully for ${productName}.`;
+    } else {
+      return `No stock found for ${productName}. Please check the product name and try again.`;
+    }
+  } catch (error) {
+    console.error("Error updating stock:", error);
+    return "An error occurred while updating the stock. Please try again.";
+  }
+};
+
+const deleteStock = async (userMessage) => {
+  try {
+    const sanitizedMessage = userMessage.replace(/\./g, '');
+
+    const match = sanitizedMessage.match(/\b(?:for|of)\s+([\w\s]+)/i);
+    if (!match) {
+      return "Please specify the product name in the format: Delete stock of [ProductName].";
+    }
+
+    const productName = match[1].trim();
+
+    const [result] = await db.query(
+      "DELETE FROM Stocks WHERE ProductName = ?",
+      [productName]
+    );
+
+    if (result.affectedRows > 0) {
+      return `Stock for ${productName} has been successfully deleted.`;
+    } else {
+      return `No stock found for ${productName}. Please check the product name and try again.`;
+    }
+  } catch (error) {
+    console.error("Error deleting stock:", error);
+    return "An error occurred while deleting the stock. Please try again.";
+  }
+};
+
+const changePrice = async (userMessage) => {
+  try {
+    let sanitizedMessage = userMessage.replace(/\s*comma\s*/gi, ',').replace(/[.!?]/g, '');
+
+    const match = sanitizedMessage.match(/\b(?:for|of)\s+([\w\s]+?)\s*(?:to)?\s*(\d+(\.\d+)?)/i);
+  
+    if (!match) {
+      return "Please provide product details in the format: Change price for [ProductName], [Price]";
+    }
+  
+    const [_, productName, priceRaw] = match;
+    const price = parseFloat(priceRaw);
+  
+    if (isNaN(price)) {
+      return "Price must be a numeric value.";
+    }
+
+    const [existingProduct] = await db.query(
+      `SELECT * FROM Stocks WHERE ProductName = ?`,
+      [productName.trim()]
+    );
+
+    if (existingProduct.length === 0) {
+      return "Product not found. Please check the product name.";
+    }
+
+    const [result] = await db.query(
+      `UPDATE Stocks SET Price = ? WHERE ProductName = ?`,
+      [price, productName.trim()]
+    );
+
+    if (result.affectedRows > 0) {
+      return `Price for ${productName} updated successfully to ${price}`;
+    } else {
+      return "Failed to update the price. Please try again.";
+    }
+  } catch (error) {
+    console.error("Error changing price:", error);
+    return "An error occurred while changing the price. Please try again.";
+  }
+};
+
+const addQuantity = async (userMessage) => {
+  try {
+    let sanitizedMessage = userMessage.replace(/\s*comma\s*/gi, ',').replace(/[.!?]/g, '');
+
+    const match = sanitizedMessage.match(/\b(?:for|of)\s+([\w\s]+?)\s*(?:by)?\s*(\d+(\.\d+)?)/i);
+  
+    if (!match) {
+      return "Please provide product details in the format: Add quantity for [ProductName], [Quantity]";
+    }
+  
+    const [_, productName, quantityRaw] = match;
+    const quantity = parseInt(quantityRaw);
+  
+    if (isNaN(quantity)) {
+      return "Quantity must be a numeric value.";
+    }
+
+    const [existingProduct] = await db.query(
+      `SELECT * FROM Stocks WHERE ProductName = ?`,
+      [productName.trim()]
+    );
+
+    if (existingProduct.length === 0) {
+      return "Product not found. Please check the product name.";
+    }
+
+    const newQuantity = existingProduct[0].Quantity + quantity;
+
+    const [result] = await db.query(
+      `UPDATE Stocks SET Quantity = ? WHERE ProductName = ?`,
+      [newQuantity, productName.trim()]
+    );
+
+    if (result.affectedRows > 0) {
+      return `Quantity for ${productName} updated successfully. New quantity: ${newQuantity}`;
+    } else {
+      return "Failed to update the quantity. Please try again.";
+    }
+  } catch (error) {
+    console.error("Error adding quantity:", error);
+    return "An error occurred while adding the quantity. Please try again.";
+  }
+};
 
 
 // test ends here
