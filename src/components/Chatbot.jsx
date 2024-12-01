@@ -77,6 +77,30 @@ const Chatbot = () => {
     addChatMessage("bot", "Format: \"delete bill with id [BillID]\"");
   }
 
+  const addStock = () => {
+    addChatMessage("bot", "Format: \"Add stock for [ProductName], [Quantity], [Price]\"");
+  }
+
+  const displayStocks = () => {
+    addChatMessage("bot", "To view current stocks just send \"Show me Stocks\" or \"Display stocks\"");
+  }
+
+  const updateStock = () => {
+    addChatMessage("bot", "Format: \"Update stock for [ProductName], [NewQuantity], [NewPrice]\"");
+  }
+
+  const deleteStock = () => {
+    addChatMessage("bot", "Format: \"Delete stock of [ProductName]\"");
+  }
+
+  const changePrice = ()=> {
+    addChatMessage("bot", "Format: \"Change price of [ProductName] to [NewPrice]\"");
+  }
+
+  const addQuantity = () => {
+    addChatMessage("bot", "Format: \"Add quantity for [ProductName] by [Quantity]\"");
+  }
+
   const handleInputChange = (e) => {
     setChatInput(e.target.value);
   };
@@ -138,42 +162,13 @@ const Chatbot = () => {
 
           <div className="options-panel">
             <h3>Stock related Queries:</h3>
-            <button onClick={displayBills}>Display Bills</button>
-            <button onClick={addCustomer}>Add Customer</button>
-            <button onClick={displayCustomers}>Display Customer</button>
-            <button onClick={updatePhone}>Update Phone</button>
-            <button onClick={addBill}>Add a New Bill</button>
-            <button onClick={deleteBill}>Delete Bill</button>
-            <button onClick={viewOldBills}>View Old Bills</button>
+            <button onClick={addStock}>Add New Stock</button>
+            <button onClick={displayStocks}>Display Stocks</button>
+            <button onClick={updateStock}>Update Stock</button>
+            <button onClick={deleteStock}>Delete Stock</button>
+            <button onClick={changePrice}>Change Price</button>
+            <button onClick={addQuantity}>Add Quantity</button>
           </div>
-
-          <div className="options-panel">
-            <h3>Stock related Queries:</h3>
-            <button onClick={displayBills}>Display Bills</button>
-            <button onClick={addCustomer}>Add Customer</button>
-            <button onClick={displayCustomers}>Display Customer</button>
-            <button onClick={updatePhone}>Update Phone</button>
-            <button onClick={addBill}>Add a New Bill</button>
-            <button onClick={deleteBill}>Delete Bill</button>
-            <button onClick={viewOldBills}>View Old Bills</button>
-          </div>
-
-          <div className="options-panel">
-            <h3>Stock related Queries:</h3>
-            <button onClick={displayBills}>Display Bills</button>
-            <button onClick={addCustomer}>Add Customer</button>
-            <button onClick={displayCustomers}>Display Customer</button>
-            <button onClick={updatePhone}>Update Phone</button>
-            <button onClick={addBill}>Add a New Bill</button>
-            <button onClick={deleteBill}>Delete Bill</button>
-            <button onClick={viewOldBills}>View Old Bills</button>
-          </div>
-
-          
-
-          
-
-          
 
           {/* Calendar Section */}
           <div className="calendar-section">

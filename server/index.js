@@ -571,7 +571,7 @@ const addStock = async (userMessage) => {
     try {
       let sanitizedMessage = userMessage.replace(/\s*comma\s*/gi, ',').replace(/[.!?]/g, '');
   
-      const match = sanitizedMessage.match(/for\s+([\w\s]+?)[,\s]+(\d+)[,\s]+(\d+(\.\d+)?)/i);
+      const match = sanitizedMessage.match(/\b(?:for|of)\s+([\w\s]+?)[,\s]+(\d+)[,\s]+(\d+(\.\d+)?)/i);
   
       if (!match) {
         return "Please provide stock details in the format: Add stock for [ProductName], [Quantity], [Price]";
@@ -720,7 +720,7 @@ const changePrice = async (userMessage) => {
     const match = sanitizedMessage.match(/\b(?:for|of)\s+([\w\s]+?)\s*(?:to)?\s*(\d+(\.\d+)?)/i);
   
     if (!match) {
-      return "Please provide product details in the format: Change price for [ProductName], [Price]";
+      return "Please provide product details in the format: Change price of [ProductName] to [NewPrice]";
     }
   
     const [_, productName, priceRaw] = match;
@@ -762,7 +762,7 @@ const addQuantity = async (userMessage) => {
     const match = sanitizedMessage.match(/\b(?:for|of)\s+([\w\s]+?)\s*(?:by)?\s*(\d+(\.\d+)?)/i);
   
     if (!match) {
-      return "Please provide product details in the format: Add quantity for [ProductName], [Quantity]";
+      return "Please provide product details in the format: Add quantity for [ProductName] by [Quantity]";
     }
   
     const [_, productName, quantityRaw] = match;
@@ -789,7 +789,7 @@ const addQuantity = async (userMessage) => {
     );
 
     if (result.affectedRows > 0) {
-      return `Quantity for ${productName} updated successfully. New quantity: ${newQuantity}`;
+      return `Quantity of ${productName} updated successfully. New quantity: ${newQuantity}`;
     } else {
       return "Failed to update the quantity. Please try again.";
     }
