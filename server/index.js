@@ -49,6 +49,17 @@ const initializeTables = async () => {
         Quantity INT,
         Price DECIMAL(10, 2)
     )
+    `,
+    `
+    CREATE TABLE BillItems (
+      BillItemID INT AUTO_INCREMENT PRIMARY KEY,
+      BillID INT NOT NULL,
+      StockID INT NOT NULL,
+      Quantity INT NOT NULL,
+      TotalPrice DECIMAL(10, 2) NOT NULL,
+      FOREIGN KEY (BillID) REFERENCES Bills(BillID) ON DELETE CASCADE,
+      FOREIGN KEY (StockID) REFERENCES Stocks(StockID) ON DELETE CASCADE
+    );
     `
   ];
 
@@ -82,10 +93,21 @@ const trainNLPModel = async () => {
   manager.addAnswer('en', 'greeting', 'Hi there! What can I do for you?');
 
   // adding new bills 
-  manager.addDocument("en", "add a new bill for [Customer Name], [TotalAmount], [PaymentStatus]");
+  manager.addDocument("en", "add a new bill for *");
+  manager.addDocument("en", "add new bill for *");
   manager.addDocument("en", "save a new bill for", "add.bill");
   manager.addDocument("en", "create a new bill for", "add.bill");
-manager.addAnswer("en", "add.bill", "Please provide the bill details in the format: [CustomerName], [TotalAmount], [PaymentStatus]");
+manager.addAnswer("en", "add.bill", "Please provide the bill details in the format: [CustomerName]");
+
+  // to update payment status
+  manager.addDocument("en", "update payment status for bill * to *", "update.payment.status");
+  manager.addDocument("en", "update status of bill * to *", "update.payment.status");
+  manager.addDocument("en", "update payment status of bill id * to *", "update.payment.status");
+  manager.addDocument("en", "update payment status of id * to *", "update.payment.status");
+  manager.addDocument("en", "update payment status for id * to *", "update.payment.status");
+  manager.addDocument("en", "set payment status of bill * to *", "update.payment.status");
+  manager.addDocument("en", "change payment status of bill * to *", "update.payment.status");
+  manager.addDocument("en", "mark bill * as *", "update.payment.status");
 
   // display bills 
   manager.addDocument("en", "display bills", "get.bills");
@@ -95,6 +117,7 @@ manager.addAnswer("en", "add.bill", "Please provide the bill details in the form
 
   //to get customer details
   manager.addDocument("en", "get customer details of [name]", "get.customer");
+  manager.addDocument("en", "display customer details of [name]", "get.customer");
   manager.addDocument("en", "show me customer details of [name]", "get.customer");
   manager.addAnswer("en", "get.customer", "Fetching customer details...");
 
@@ -105,17 +128,24 @@ manager.addAnswer("en", "add.bill", "Please provide the bill details in the form
   manager.addAnswer("en", "add.customer", "Please provide the customer details in the format: [CustomerName], [Phone]");
 
   // to update phone
-  manager.addDocument("en", "update phone for [CustomerName], [NewPhone]", "update.customer.phone");
-  manager.addDocument("en", "change phone for [CustomerName], [NewPhone]", "update.customer.phone");
-  manager.addDocument("en", "modify contact info for [CustomerName], [NewPhone]", "update.customer.phone");
+  manager.addDocument("en", "update phone number of", "update.customer.phone");
+  manager.addDocument("en", "change phone number of", "update.customer.phone");
+  manager.addDocument("en", "update phone number", "update.customer.phone");
+  manager.addDocument("en", "update phone for * to *", "update.customer.phone");
+  manager.addDocument("en", "update phone for * to *", "update.customer.phone");
+  manager.addDocument("en", "update phone number for * to *", "update.customer.phone");
+  manager.addDocument("en", "update phone number of * to *", "update.customer.phone");
+  manager.addDocument("en", "change phone for * to *", "update.customer.phone");
+  manager.addDocument("en", "change phone of * to *", "update.customer.phone");
+  manager.addDocument("en", "modify contact info for * to *", "update.customer.phone");
   manager.addAnswer("en", "update.customer.phone", "Updating the phone number...");
 
   //to view bills of a particular date
-  manager.addDocument("en", "show me the bills for [Date]", "get.bills.by.date");
-  manager.addDocument("en", "display the bills of [Date]", "get.bills.by.date");
-  manager.addDocument("en", "fetch the bills for [Date]", "get.bills.by.date");
-  manager.addDocument("en", "get bills dated [Date]", "get.bills.by.date");
-  manager.addDocument("en", "bills from [Date]", "get.bills.by.date");
+  manager.addDocument("en", "show me the bills for */*/*", "get.bills.by.date");
+  manager.addDocument("en", "display the bills of */*/*", "get.bills.by.date");
+  manager.addDocument("en", "fetch the bills for */*/*", "get.bills.by.date");
+  manager.addDocument("en", "get bills dated */*/*", "get.bills.by.date");
+  manager.addDocument("en", "bills from */*/*", "get.bills.by.date");
   manager.addAnswer("en", "get.bills.by.date", "Fetching bills for the specified date...");
 
   // to delete a bill
@@ -176,6 +206,32 @@ manager.addDocument('en', 'increase stock of * by *', 'add.quantity');
 manager.addDocument('en', 'add more quantity for * by *', 'add.quantity');
 manager.addDocument('en', 'add more quantity of * by *', 'add.quantity');
 
+  // adding bill items
+  manager.addDocument("en", "add * * to bill ", "add.bill.item");
+  manager.addDocument("en", "add * * in bill id ", "add.bill.item");
+  manager.addDocument("en", "add * * to bill id ", "add.bill.item");
+  manager.addDocument("en", "add * * in bill ", "add.bill.item");
+  manager.addDocument("en", "add * * to id ", "add.bill.item");
+  manager.addDocument("en", "add * * to id ", "add.bill.item");
+  manager.addDocument("en", "add * * in id ", "add.bill.item");
+
+  // for the latest bill items
+  manager.addDocument('en', 'show me the latest bill items', 'get.latest.bill.items');
+  manager.addDocument('en', 'show me the latest items', 'get.latest.bill.items');
+  manager.addDocument('en', 'fetch the latest bill items', 'get.latest.bill.items');
+  manager.addDocument('en', 'display the most recent bill items', 'get.latest.bill.items');
+  manager.addDocument('en', 'show the most recent bill items', 'get.latest.bill.items');
+  manager.addDocument('en', 'give me the latest bill items', 'get.latest.bill.items');
+
+  // to view items of a particular bill 
+  manager.addDocument('en', 'show me the items of bill id [BillID]', 'get.bill.items.by.id');
+  manager.addDocument('en', 'show me items of id [BillID]', 'get.bill.items.by.id');
+  manager.addDocument('en', 'fetch bill items of bill id [BillID]', 'get.bill.items.by.id');
+  manager.addDocument('en', 'show bill items of [BillID]', 'get.bill.items.by.id');
+  manager.addDocument('en', 'get items of bill [BillID]', 'get.bill.items.by.id');
+  manager.addDocument('en', 'display the bill items of [BillID]', 'get.bill.items.by.id');
+  manager.addDocument('en', 'show the items for bill [BillID]', 'get.bill.items.by.id');
+
 
 
 
@@ -207,7 +263,8 @@ app.post("/chat", async (req, res) => {
           Bills.BillID,
           Customers.Name AS CustomerName,
           Bills.TotalAmount,
-          Bills.BillDate
+          Bills.BillDate,
+          Bills.PaymentStatus
         FROM 
           Bills
         JOIN 
@@ -221,29 +278,37 @@ app.post("/chat", async (req, res) => {
       botMessage = await getCustomerDetails(userMessage);
     } else if (response.intent === "update.customer.phone") { 
       botMessage = await updateCustomerPhone(userMessage);
-    } else if (response.intent === "greeting") {
+    }else if (response.intent ==="greeting") {
       botMessage = response.answer || "Hello! How can I assist you today?";
-    } else if (response.intent === "add.bill") {
+    }else if (response.intent === "add.bill") {
       botMessage = await addBill(userMessage);
-    } else if (response.intent === "get.bills.by.date") {
+    } else if(response.intent=== "get.bills.by.date") {
       botMessage = await getBillsByDate(userMessage);
-    } else if (response.intent === "add.customer") {
+    } else if(response.intent === "add.customer") {
       botMessage = await addCustomer(userMessage);
-    } else if (response.intent === "delete.bill") {
+    } else if (response.intent=== "delete.bill") {
       botMessage = await deleteBill(userMessage);
-    } else if (response.intent === "add.stock") {
+    } else if(response.intent === "add.stock") {
       botMessage = await addStock(userMessage);
-    } else if (response.intent === "get.stocks") {
+    }else if(response.intent=== "get.stocks") {
       botMessage = await getStocks();
     } else if (response.intent === "update.stock") {
       botMessage = await updateStock(userMessage);
-    } else if (response.intent === "delete.stock") {
+    }else if (response.intent === "delete.stock") {
       botMessage = await deleteStock(userMessage);
-    } else if (response.intent === "change.price") {
+    }else if (response.intent === "change.price") {
       botMessage = await changePrice(userMessage);
-    } else if (response.intent === "add.quantity") {
+    }else if (response.intent === "add.quantity") {
       botMessage = await addQuantity(userMessage);
-    } else {
+    }else if(response.intent === "update.payment.status") {  
+      botMessage = await updatePaymentStatus(userMessage);
+    }else if(response.intent === "add.bill.item") {
+      botMessage = await addBillItem(userMessage);
+    }else if (response.intent === "get.latest.bill.items") {
+      botMessage = await getLatestBillItems(userMessage); 
+    }else if(response.intent === "get.bill.items.by.id") {
+      botMessage = await getBillItemsByBillID(userMessage); 
+    }else {
       botMessage = "Sorry, I didn't understand that. Can you please clarify your request?";
     }
   } catch (error) {
@@ -259,27 +324,23 @@ app.post("/chat", async (req, res) => {
 const addBill = async (userMessage) => {
   try {
     let sanitizedMessage = userMessage.replace(/\s*comma\s*/gi, ',');
-
     sanitizedMessage = sanitizedMessage.replace(/[.!?]/g, '');
 
-    const match = sanitizedMessage.match(/for\s+([\w\s]+?)[,\s]+([\d,]+)[,\s]+(.+)/i);
+    const match = sanitizedMessage.match(/for\s+([\w\s]+)/i);
 
     if (!match) {
-      return "Please provide the details in the format: Add a bill for [CustomerName], [TotalAmount], [PaymentStatus]";
+      return "Please provide the details in the format: Add a bill for [CustomerName]";
     }
 
-    const [_, customerName, totalAmountRaw, paymentStatus] = match;
-    const totalAmount = parseFloat(totalAmountRaw.replace(/,/g, ''));
-
-    if (isNaN(totalAmount)) {
-      return "TotalAmount must be numeric.";
-    }
+    const customerName = match[1].trim();
 
     const billDate = new Date();
+    const totalAmount = 0; 
+    const paymentStatus = "Pending"; 
 
     const [existingCustomer] = await db.query(
-      "SELECT * FROM Customers WHERE Name = ? LIMIT 1", 
-      [customerName.trim()]
+      "SELECT * FROM Customers WHERE Name = ? LIMIT 1",
+      [customerName]
     );
 
     let customerID;
@@ -288,14 +349,14 @@ const addBill = async (userMessage) => {
     } else {
       const [result] = await db.query(
         `INSERT INTO Customers (Name) VALUES (?)`,
-        [customerName.trim()]
+        [customerName]
       );
       customerID = result.insertId;
     }
 
     const [billResult] = await db.query(
       `INSERT INTO Bills (BillDate, CustomerID, TotalAmount, PaymentStatus) VALUES (?, ?, ?, ?)`,
-      [billDate, customerID, totalAmount, paymentStatus.trim()]
+      [billDate, customerID, totalAmount, paymentStatus]
     );
 
     if (billResult.affectedRows > 0) {
@@ -309,6 +370,7 @@ const addBill = async (userMessage) => {
   }
 };
 
+
   const formatBillsTable = (bills) => {
     if (bills.length === 0) {
       return "No bills found.";
@@ -321,6 +383,7 @@ const addBill = async (userMessage) => {
             <th>Bill ID</th>
             <th>Customer Name</th>
             <th>Amount</th>
+            <th>Payment Status</th>
             <th>Date</th>
           </tr>
         </thead>
@@ -333,6 +396,7 @@ const addBill = async (userMessage) => {
           <td>${bill.BillID}</td>
           <td>${bill.CustomerName}</td>
           <td>${bill.TotalAmount}</td>
+          <td>${bill.PaymentStatus}</td>
           <td>${new Date(bill.BillDate).toLocaleString()}</td>
         </tr>
       `;
@@ -427,6 +491,41 @@ const addBill = async (userMessage) => {
     }
   };
 
+  const updatePaymentStatus = async (userMessage) => {
+    try {
+      let sanitizedMessage = userMessage.replace(/\s*comma\s*/gi, ',');
+      sanitizedMessage = sanitizedMessage.replace(/[.!?]/g, '');
+  
+      const match = sanitizedMessage.match(/(?:for|of)\s*(?:bill|ID|Bill\s*ID)\s*(\d+)\s*to\s*([\w\s]+)/i);
+  
+      if (!match) {
+        return "Please provide the details in the format: Update payment status for bill [BillID] to [PaymentStatus]";
+      }
+  
+      const billID = parseInt(match[1]);
+      const paymentStatus = match[2].trim();
+  
+      if (isNaN(billID)) {
+        return "Invalid Bill ID.";
+      }
+  
+      const [result] = await db.query(
+        `UPDATE Bills SET PaymentStatus = ? WHERE BillID = ?`,
+        [paymentStatus, billID]
+      );
+  
+      if (result.affectedRows > 0) {
+        return `Payment status of Bill ID ${billID} has been successfully updated to ${paymentStatus}.`;
+      } else {
+        return `Failed to update the payment status. Please check the Bill ID and try again.`;
+      }
+    } catch (error) {
+      console.error("Error updating payment status:", error);
+      return "An error occurred while updating the payment status. Please try again.";
+    }
+  };
+  
+
 
   // this function is for updating phone number  of a customer
   const updateCustomerPhone = async (userMessage) => {
@@ -434,10 +533,10 @@ const addBill = async (userMessage) => {
       let sanitizedMessage = userMessage.replace(/\s*comma\s*/gi, ',');  
       sanitizedMessage = sanitizedMessage.replace(/[.!?-]/g, '');  
 
-      const match = sanitizedMessage.match(/(?:for|of)\s+([A-Za-z\s]+)(?:,\s*|\s+)(\d{10,15})/i);
+      const match = sanitizedMessage.match(/(?:for|of)\s+([A-Za-z\s]+?)(?:,\s*|\s+|\s*to\s+)(\d{10,15})/i);
 
       if (!match) {
-        return "Please provide the details in the format: Update phone for [CustomerName], [NewPhone].";
+        return "Please provide the details in the format: Update phone of [CustomerName] to [NewPhone].";
       }
 
       const [_, customerName, newPhone] = match;
@@ -798,6 +897,219 @@ const addQuantity = async (userMessage) => {
     return "An error occurred while adding the quantity. Please try again.";
   }
 };
+
+const addBillItem = async (userMessage) => {
+  try {
+    let sanitizedMessage = userMessage.replace(/\s*comma\s*/gi, ',').replace(/[.!?]/g, '');
+
+    const match = sanitizedMessage.match(/add\s+(\d+)\s+([\w\s]+?)\s+(?:to\s+|in\s+)?(?:bill\s+id\s*|\s*bill\s*|\s*id\s*)\s*(\d+)/i);
+
+    if (!match) {
+      return "Please provide the details in the format: Add [Quantity] [ProductName] to bill [BillID].";
+    }
+
+    const [_, quantityRaw, productName, billID] = match;
+    const quantity = parseInt(quantityRaw, 10);
+
+    if (isNaN(quantity) || quantity <= 0) {
+      return "Quantity must be a positive numeric value.";
+    }
+
+    const [bill] = await db.query("SELECT * FROM Bills WHERE BillID = ?", [billID]);
+    if (bill.length === 0) {
+      return `No bill found with ID ${billID}.`;
+    }
+
+    const [product] = await db.query("SELECT * FROM Stocks WHERE ProductName = ?", [productName.trim()]);
+    if (product.length === 0) {
+      return `No product found with name "${productName}".`;
+    }
+
+    const stock = product[0];
+    if (stock.Quantity < quantity) {
+      return `Insufficient stock for "${productName}". Available: ${stock.Quantity}`;
+    }
+
+    const totalPrice = stock.Price * quantity;
+
+    const [result] = await db.query(
+      `INSERT INTO BillItems (BillID, StockID, Quantity, TotalPrice) VALUES (?, ?, ?, ?)`,
+      [billID, stock.StockID, quantity, totalPrice]
+    );
+
+    if (result.affectedRows > 0) {
+      await db.query(
+        `UPDATE Bills SET TotalAmount = TotalAmount + ? WHERE BillID = ?`,
+        [totalPrice, billID]
+      );
+
+      await db.query(
+        `UPDATE Stocks SET Quantity = Quantity - ? WHERE StockID = ?`,
+        [quantity, stock.StockID]
+      );
+
+      return `Item added to bill successfully! Product: ${productName}, Quantity: ${quantity}, Total Price: ${totalPrice}`;
+    } else {
+      return "Failed to add the item to the bill. Please try again.";
+    }
+  } catch (error) {
+    console.error("Error adding item to bill:", error);
+    return "An error occurred while adding the item to the bill. Please try again.";
+  }
+};
+
+
+const deleteBillItem = async (userMessage) => {
+  try {
+    const sanitizedMessage = userMessage.replace(/\./g, '');
+
+    const match = sanitizedMessage.match(/bill\s+item\s+id\s+(\d+)/i);
+    if (!match) {
+      return "Please specify the Bill Item ID in the format: Delete bill item with ID [BillItemID].";
+    }
+
+    const billItemID = parseInt(match[1], 10);
+
+    const [billItem] = await db.query("SELECT * FROM BillItems WHERE BillItemID = ?", [billItemID]);
+    if (billItem.length === 0) {
+      return `No bill item found with ID ${billItemID}.`;
+    }
+
+    const { BillID, StockID, Quantity, TotalPrice } = billItem[0];
+
+    const [result] = await db.query("DELETE FROM BillItems WHERE BillItemID = ?", [billItemID]);
+
+    if (result.affectedRows > 0) {
+      await db.query("UPDATE Bills SET TotalAmount = TotalAmount - ? WHERE BillID = ?", [TotalPrice, BillID]);
+
+      await db.query("UPDATE Stocks SET Quantity = Quantity + ? WHERE StockID = ?", [Quantity, StockID]);
+
+      return `Bill item with ID ${billItemID} has been successfully deleted.`;
+    } else {
+      return "Failed to delete the bill item. Please try again.";
+    }
+  } catch (error) {
+    console.error("Error deleting bill item:", error);
+    return "An error occurred while deleting the bill item. Please try again.";
+  }
+};
+
+const getLatestBillItems = async () => {
+  try {
+    const [rows] = await db.query(`
+      SELECT 
+        BillItems.BillItemID,
+        BillItems.BillID,
+        Stocks.ProductName,
+        BillItems.Quantity,
+        BillItems.TotalPrice
+      FROM 
+        BillItems
+      INNER JOIN 
+        Bills ON BillItems.BillID = Bills.BillID
+      INNER JOIN 
+        Stocks ON BillItems.StockID = Stocks.StockID
+      LIMIT 15
+    `);
+
+    if (rows.length === 0) {
+      return "No bill items found.";
+    }
+
+    let table = `
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr>
+            <th>Bill Item ID</th>
+            <th>Product Name</th>
+            <th>Quantity</th>
+            <th>Total Price</th>
+            <th>Added To Bill ID</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    rows.forEach((item) => {
+      table += `
+        <tr>
+          <td>${item.BillItemID}</td>
+          <td>${item.ProductName}</td>
+          <td>${item.Quantity}</td>
+          <td>${item.TotalPrice}</td>
+          <td>${item.BillID}</td>
+        </tr>
+      `;
+    });
+
+    table += `</tbody></table>`;
+    return `Here are the latest 15 bill items:<br>${table}`;
+  } catch (error) {
+    console.error("Error fetching latest bill items:", error);
+    return "An error occurred while fetching the latest bill items. Please try again.";
+  }
+};
+
+const getBillItemsByBillID = async (userMessage) => {
+  try {
+    const billIDMatch = userMessage.match(/\b(?:bill\s*(?:id)?|id)\s*(\d+)\b/i);
+
+    if (!billIDMatch) {
+      return "Please provide a valid Bill ID.";
+    }
+
+    const billID = billIDMatch[1]; 
+
+    const [rows] = await db.query(`
+      SELECT 
+        Stocks.ProductName,
+        BillItems.Quantity,
+        BillItems.TotalPrice,
+        BillItems.BillID
+      FROM 
+        BillItems
+      JOIN 
+        Stocks ON BillItems.StockID = Stocks.StockID
+      WHERE 
+        BillItems.BillID = ?
+    `, [billID]);
+
+    if (rows.length === 0) {
+      return `No items found for bill ID ${billID}.`;
+    }
+
+    let table = `
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr>
+            <th>Product Name</th>
+            <th>Quantity</th>
+            <th>Total Price</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    rows.forEach((item) => {
+      table += `
+        <tr>
+          <td>${item.ProductName}</td>
+          <td>${item.Quantity}</td>
+          <td>${item.TotalPrice}</td>
+        </tr>
+      `;
+    });
+
+    table += `</tbody></table>`;
+    return `Here are the items for Bill ID ${billID}:<br>${table}`;
+  } catch (error) {
+    console.error("Error fetching bill items by BillID:", error);
+    return "An error occurred while fetching the bill items. Please try again.";
+  }
+};
+
+
+
 
 
 // test ends here
