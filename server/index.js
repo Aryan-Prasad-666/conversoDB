@@ -377,7 +377,7 @@ const getBills = async () => {
         Bills.PaymentStatus
       FROM Bills JOIN Customers ON 
       Bills.CustomerID = Customers.CustomerID
-      ORDER BY Bills.BillDate ASC
+      ORDER BY Bills.BillID ASC
       LIMIT 10
     `);
 
@@ -613,6 +613,8 @@ const getBills = async () => {
           Bills.CustomerID = Customers.CustomerID
         WHERE 
           DATE(Bills.BillDate) = DATE(?)
+        ORDER BY 
+          Bills.BillID ASC
         `,
         [queryDate]
       );
