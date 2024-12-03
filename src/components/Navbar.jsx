@@ -16,9 +16,6 @@ const Navbar = () => {
           <Link to="/chatbot" className="nav-link">Chatbot</Link>
         </li>
         <li>
-          <Link to="/bills" className="nav-link">Bills</Link>
-        </li>
-        <li>
           <Link to="/profile" className="nav-link">Profile</Link>
         </li>
         <li>

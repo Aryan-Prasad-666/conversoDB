@@ -1058,12 +1058,24 @@ const getBillItemsByBillID = async (userMessage) => {
 
     const billID = billIDMatch[1]; 
 
+    const [bill] = await db.query(`
+      SELECT TotalAmount FROM Bills WHERE BillID = ?
+    `, [billID]);
+
+    if (bill.length === 0) {
+      return `No bill found with ID ${billID}.`;
+    }
+    const totalAmount = Number(bill[0].TotalAmount);
+
+    if (isNaN(totalAmount)) {
+      return "Invalid total amount found for this bill.";
+    }
+
     const [rows] = await db.query(`
       SELECT 
         Stocks.ProductName,
         BillItems.Quantity,
-        BillItems.TotalPrice,
-        BillItems.BillID
+        BillItems.TotalPrice
       FROM 
         BillItems
       JOIN 
@@ -1098,7 +1110,13 @@ const getBillItemsByBillID = async (userMessage) => {
       `;
     });
 
-    table += `</tbody></table>`;
+    table += `
+        <tr style="font-weight: bold; background-color: #f05562;">
+          <td colspan="2" style="text-align: right;">Total Amount:</td>
+          <td>${totalAmount.toFixed(2)}</td>
+        </tr>
+    </tbody></table>`;
+
     return `Here are the items for Bill ID ${billID}:<br>${table}`;
   } catch (error) {
     console.error("Error fetching bill items by BillID:", error);
