@@ -57,7 +57,7 @@ const initializeTables = async () => {
         Quantity INT NOT NULL,
         TotalPrice DECIMAL(10, 2) NOT NULL,
         FOREIGN KEY (BillID) REFERENCES Bills(BillID) ON DELETE CASCADE,
-        FOREIGN KEY (StockID) REFERENCES Stocks(StockID) ON DELETE CASCADE
+        FOREIGN KEY (StockID) REFERENCES Stocks(StockID) ON DELETE RESTRICT
     )`
   ];
 
@@ -1073,6 +1073,7 @@ const getBillItemsByBillID = async (userMessage) => {
 
     const [rows] = await db.query(`
       SELECT 
+      BillItems.BillItemID,
         Stocks.ProductName,
         BillItems.Quantity,
         BillItems.TotalPrice
@@ -1092,6 +1093,7 @@ const getBillItemsByBillID = async (userMessage) => {
       <table style="width: 100%; border-collapse: collapse;">
         <thead>
           <tr>
+            <th>Bill Item ID</th>
             <th>Product Name</th>
             <th>Quantity</th>
             <th>Total Price</th>
@@ -1103,6 +1105,7 @@ const getBillItemsByBillID = async (userMessage) => {
     rows.forEach((item) => {
       table += `
         <tr>
+        <td>${item.BillItemID}</td>
           <td>${item.ProductName}</td>
           <td>${item.Quantity}</td>
           <td>${item.TotalPrice}</td>
@@ -1112,7 +1115,7 @@ const getBillItemsByBillID = async (userMessage) => {
 
     table += `
         <tr style="font-weight: bold; background-color: #f05562;">
-          <td colspan="2" style="text-align: right;">Total Amount:</td>
+          <td colspan="3" style="text-align: right;">Total Amount:</td>
           <td>${totalAmount.toFixed(2)}</td>
         </tr>
     </tbody></table>`;

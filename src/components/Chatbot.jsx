@@ -176,7 +176,7 @@ const Chatbot = () => {
             <DatePicker
               selected={selectedDate}
               onChange={handleDateChange}
-              dateFormat="yyyy-MM-dd"
+              dateFormat="dd/MM/yyyy"
               placeholderText="Select a day"
               className="calendar-input"
             />
