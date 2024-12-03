@@ -189,7 +189,7 @@ const Chatbot = () => {
           <div className="options-panel">
             <h3>Bill Items related Queries:</h3>
             <button onClick={addBillItem}>Add Bill Item</button>
-            <button onClick={latestBillItems}>Latest Bill Items</button>
+            <button onClick={latestBillItems}>View Latest Bill Items</button>
             <button onClick={viewBillItemsOfABill}>View Bill Items of a Bill</button>
             <button onClick={deleteBillItem}>Delete Bill Item</button>
           </div>
