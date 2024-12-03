@@ -77,6 +77,10 @@ const Chatbot = () => {
     addChatMessage("bot", "Format: \"delete bill with id [BillID]\"");
   }
 
+  const updatePaymentStatus = () =>{
+    addChatMessage("bot", "Format: \"Update payment status of bill [BillID] to [PaymentStatus]\"");
+  }
+
   const addStock = () => {
     addChatMessage("bot", "Format: \"Add stock for [ProductName], [Quantity], [Price]\"");
   }
@@ -174,6 +178,7 @@ const Chatbot = () => {
             <button onClick={addBill}>Add a New Bill</button>
             <button onClick={deleteBill}>Delete Bill</button>
             <button onClick={viewOldBills}>View Old Bills</button>
+            <button onClick={updatePaymentStatus}>Update Payment Status</button>
           </div>
 
           <div className="options-panel">
