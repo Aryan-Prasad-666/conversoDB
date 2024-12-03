@@ -66,7 +66,7 @@ const Chatbot = () => {
   }
 
   const addBill = () =>{
-    addChatMessage("bot", "Format: \"Add a bill for [CustomerName], [TotalAmount], [PaymentStatus]\"");
+    addChatMessage("bot", "Format: \"Add a bill for [CustomerName].\"");
   }
 
   const viewOldBills = () => {
