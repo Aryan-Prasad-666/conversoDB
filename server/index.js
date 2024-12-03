@@ -114,9 +114,13 @@ manager.addAnswer("en", "add.bill", "Please provide the bill details in the form
   manager.addAnswer("en", "get.bills", "Fetching your latest bills...");
 
   //to get customer details
-  manager.addDocument("en", "get customer details of [name]", "get.customer");
-  manager.addDocument("en", "display customer details of [name]", "get.customer");
-  manager.addDocument("en", "show me customer details of [name]", "get.customer");
+  manager.addDocument("en", "get customer details of *", "get.customer");
+  manager.addDocument("en", "display customer details of *", "get.customer");
+  manager.addDocument("en", "customer details of *", "get.customer");
+  manager.addDocument("en", "what are the details of *", "get.customer");
+  manager.addDocument("en", "show customer details of *", "get.customer");
+  manager.addDocument("en", "show me details of *", "get.customer");
+  manager.addDocument("en", "can you show customer details of *", "get.customer");
   manager.addAnswer("en", "get.customer", "Fetching customer details...");
 
   // to add  new customer
@@ -261,22 +265,7 @@ app.post("/chat", async (req, res) => {
     }
 
     if (response.intent === "get.bills") {
-      const [rows] = await db.query(`
-        SELECT 
-          Bills.BillID,
-          Customers.Name AS CustomerName,
-          Bills.TotalAmount,
-          Bills.BillDate,
-          Bills.PaymentStatus
-        FROM 
-          Bills
-        JOIN 
-          Customers
-        ON 
-          Bills.CustomerID = Customers.CustomerID
-        LIMIT 10
-      `);
-      botMessage = formatBillsTable(rows);
+      botMessage = await getBills();
     } else if (response.intent === "get.customer") {
       botMessage = await getCustomerDetails(userMessage);
     } else if (response.intent === "update.customer.phone") { 
@@ -376,8 +365,23 @@ const addBill = async (userMessage) => {
 };
 
 
-  const formatBillsTable = (bills) => {
-    if (bills.length === 0) {
+const getBills = async () => {
+  try {
+    const [rows] = await db.query(`
+      SELECT 
+        Bills.BillID,
+        Customers.CustomerID,
+        Customers.Name AS CustomerName,
+        Bills.TotalAmount,
+        Bills.BillDate,
+        Bills.PaymentStatus
+      FROM Bills JOIN Customers ON 
+      Bills.CustomerID = Customers.CustomerID
+      ORDER BY Bills.BillDate ASC
+      LIMIT 10
+    `);
+
+    if (rows.length === 0) {
       return "No bills found.";
     }
 
@@ -387,6 +391,7 @@ const addBill = async (userMessage) => {
           <tr>
             <th>Bill ID</th>
             <th>Customer Name</th>
+            <th>Customer ID</th>
             <th>Amount</th>
             <th>Payment Status</th>
             <th>Date</th>
@@ -394,12 +399,13 @@ const addBill = async (userMessage) => {
         </thead>
         <tbody>
     `;
-    
-    bills.forEach((bill) => {
+
+    rows.forEach((bill) => {
       table += `
         <tr>
           <td>${bill.BillID}</td>
           <td>${bill.CustomerName}</td>
+          <td>${bill.CustomerID}</td>
           <td>${bill.TotalAmount}</td>
           <td>${bill.PaymentStatus}</td>
           <td>${new Date(bill.BillDate).toLocaleString()}</td>
@@ -409,7 +415,12 @@ const addBill = async (userMessage) => {
 
     table += `</tbody></table>`;
     return `Here are your latest bills:<br>${table}`;
-  };
+  } catch (error) {
+    console.error("Error fetching bills:", error);
+    return "An error occurred while fetching bills. Please try again.";
+  }
+};
+
 
   // this function is to add new customers
   const addCustomer = async (userMessage) => {
@@ -453,7 +464,7 @@ const addBill = async (userMessage) => {
   // this function is to display customer's details
   const getCustomerDetails = async (userMessage) => {
     try {
-      const match = userMessage.match(/of\s+([A-Za-z\s]+)/i);
+      const match = userMessage.match(/(?:of|for)\s+([A-Za-z\s]+)$/i);
       if (!match) {
         return "Please specify a valid customer name.";
       }

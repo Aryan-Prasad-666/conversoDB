@@ -169,7 +169,7 @@ const Chatbot = () => {
             <h3>Need Help?</h3>
             <button onClick={displayBills}>Display Bills</button>
             <button onClick={addCustomer}>Add Customer</button>
-            <button onClick={displayCustomers}>Display Customer</button>
+            <button onClick={displayCustomers}>Display Customer Details</button>
             <button onClick={updatePhone}>Update Phone</button>
             <button onClick={addBill}>Add a New Bill</button>
             <button onClick={deleteBill}>Delete Bill</button>
