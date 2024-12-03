@@ -50,17 +50,15 @@ const initializeTables = async () => {
         Price DECIMAL(10, 2)
     )
     `,
-    `
-    CREATE TABLE BillItems (
-      BillItemID INT AUTO_INCREMENT PRIMARY KEY,
-      BillID INT NOT NULL,
-      StockID INT NOT NULL,
-      Quantity INT NOT NULL,
-      TotalPrice DECIMAL(10, 2) NOT NULL,
-      FOREIGN KEY (BillID) REFERENCES Bills(BillID) ON DELETE CASCADE,
-      FOREIGN KEY (StockID) REFERENCES Stocks(StockID) ON DELETE CASCADE
-    );
-    `
+    `CREATE TABLE IF NOT EXISTS BillItems (
+        BillItemID INT AUTO_INCREMENT PRIMARY KEY,
+        BillID INT NOT NULL,
+        StockID INT NOT NULL,
+        Quantity INT NOT NULL,
+        TotalPrice DECIMAL(10, 2) NOT NULL,
+        FOREIGN KEY (BillID) REFERENCES Bills(BillID) ON DELETE CASCADE,
+        FOREIGN KEY (StockID) REFERENCES Stocks(StockID) ON DELETE CASCADE
+    )`
   ];
 
   try {
