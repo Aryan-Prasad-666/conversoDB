@@ -603,8 +603,10 @@ const getBills = async () => {
         SELECT 
           Bills.BillID,
           Customers.Name AS CustomerName,
+          Customers.CustomerID,
           Bills.TotalAmount,
-          Bills.BillDate
+          Bills.BillDate,
+          Bills.PaymentStatus
         FROM 
           Bills
         JOIN 
@@ -629,7 +631,9 @@ const getBills = async () => {
             <tr>
               <th>Bill ID</th>
               <th>Customer Name</th>
+              <th>Customer ID</th>
               <th>Amount</th>
+              <th>Payment Status</th>
               <th>Date</th>
             </tr>
           </thead>
@@ -640,9 +644,11 @@ const getBills = async () => {
         table += `
           <tr>
             <td>${bill.BillID}</td>
-            <td>${bill.CustomerName}</td>
-            <td>${bill.TotalAmount}</td>
-            <td>${new Date(bill.BillDate).toLocaleString()}</td>
+          <td>${bill.CustomerName}</td>
+          <td>${bill.CustomerID}</td>
+          <td>${bill.TotalAmount}</td>
+          <td>${bill.PaymentStatus}</td>
+          <td>${new Date(bill.BillDate).toLocaleString()}</td>
           </tr>
         `;
       });
