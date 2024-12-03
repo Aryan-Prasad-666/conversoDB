@@ -101,6 +101,22 @@ const Chatbot = () => {
     addChatMessage("bot", "Format: \"Add quantity for [ProductName] by [Quantity]\"");
   }
 
+  const addBillItem = () => {
+    addChatMessage("bot", "Format: \"Add [Quantity] [ProductName] to bill [BillID]\"");
+  }
+
+  const latestBillItems = () => {
+    addChatMessage("bot", "To see the most recent bill items add just say\"show me the latest bill items\" or anything similar");
+  }
+
+  const viewBillItemsOfABill = () => {
+    addChatMessage("bot", "Format: \"Show me the items of bill id [BillID]\"");
+  }
+
+  const deleteBillItem = () => {
+    addChatMessage("bot", "Format: \"Delete [ProductName] from Bill id [BillID]\"");
+  }
+
   const handleInputChange = (e) => {
     setChatInput(e.target.value);
   };
@@ -168,6 +184,14 @@ const Chatbot = () => {
             <button onClick={deleteStock}>Delete Stock</button>
             <button onClick={changePrice}>Change Price</button>
             <button onClick={addQuantity}>Add Quantity</button>
+          </div>
+
+          <div className="options-panel">
+            <h3>Bill Items related Queries:</h3>
+            <button onClick={addBillItem}>Add Bill Item</button>
+            <button onClick={latestBillItems}>Latest Bill Items</button>
+            <button onClick={viewBillItemsOfABill}>View Bill Items of a Bill</button>
+            <button onClick={deleteBillItem}>Delete Bill Item</button>
           </div>
 
           {/* Calendar Section */}

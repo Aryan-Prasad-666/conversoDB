@@ -231,7 +231,12 @@ manager.addDocument('en', 'add more quantity of * by *', 'add.quantity');
   manager.addDocument('en', 'show the items for bill [BillID]', 'get.bill.items.by.id');
 
 
-
+  // to delete an item from a bill
+  manager.addDocument("en", "remove * from bill *", "delete.bill.item");
+  manager.addDocument("en", "delete * from bill *", "delete.bill.item");
+  manager.addDocument("en", "delete * from bill id *", "delete.bill.item");
+  manager.addDocument("en", "remove * from bill id *", "delete.bill.item");
+  manager.addAnswer("en", "delete.bill.item", "Deleting the bill item...");
 
   
 
@@ -306,7 +311,9 @@ app.post("/chat", async (req, res) => {
       botMessage = await getLatestBillItems(userMessage); 
     }else if(response.intent === "get.bill.items.by.id") {
       botMessage = await getBillItemsByBillID(userMessage); 
-    }else {
+    } else if(response.intent === "delete.bill.item") {
+      botMessage = await deleteBillItem(userMessage); 
+    } else {
       botMessage = "Sorry, I didn't understand that. Can you please clarify your request?";
     }
   } catch (error) {
@@ -959,38 +966,62 @@ const addBillItem = async (userMessage) => {
 
 const deleteBillItem = async (userMessage) => {
   try {
-    const sanitizedMessage = userMessage.replace(/\./g, '');
-
-    const match = sanitizedMessage.match(/bill\s+item\s+id\s+(\d+)/i);
+    const sanitizedMessage = userMessage.replace(/[.!?]/g, '').toLowerCase();
+    const match = sanitizedMessage.match(/(remove|delete)\s+([a-zA-Z\s]+)\s+from\s+(bill\s+id|id)?\s*(\d+)/i);
+    
     if (!match) {
-      return "Please specify the Bill Item ID in the format: Delete bill item with ID [BillItemID].";
+      return "Please specify the product name and Bill ID in the format: Delete [ProductName] from Bill id [BillID].";
     }
 
-    const billItemID = parseInt(match[1], 10);
+    const productName = match[2].trim();
+    const billNo = parseInt(match[4], 10); 
 
-    const [billItem] = await db.query("SELECT * FROM BillItems WHERE BillItemID = ?", [billItemID]);
-    if (billItem.length === 0) {
-      return `No bill item found with ID ${billItemID}.`;
+    if (isNaN(billNo)) {
+      return "Invalid bill ID. Please provide a valid number for the bill ID.";
     }
 
-    const { BillID, StockID, Quantity, TotalPrice } = billItem[0];
-
-    const [result] = await db.query("DELETE FROM BillItems WHERE BillItemID = ?", [billItemID]);
-
-    if (result.affectedRows > 0) {
-      await db.query("UPDATE Bills SET TotalAmount = TotalAmount - ? WHERE BillID = ?", [TotalPrice, BillID]);
-
-      await db.query("UPDATE Stocks SET Quantity = Quantity + ? WHERE StockID = ?", [Quantity, StockID]);
-
-      return `Bill item with ID ${billItemID} has been successfully deleted.`;
-    } else {
-      return "Failed to delete the bill item. Please try again.";
+    // Ensure we extract the correct results
+    const [billItems] = await db.query(
+      `
+      SELECT 
+        BillItems.BillItemID, 
+        BillItems.StockID, 
+        BillItems.Quantity, 
+        BillItems.TotalPrice 
+      FROM 
+        BillItems 
+      JOIN 
+        Stocks ON BillItems.StockID = Stocks.StockID
+      WHERE 
+        BillItems.BillID = ? AND Stocks.ProductName LIKE ?
+      `,
+      [billNo, `%${productName}%`]
+    );
+    
+    if (billItems.length === 0) {
+      return `No items found for "${productName}" in bill ID ${billNo}.`;
     }
+
+    for (let billItem of billItems) {
+      const { BillItemID, StockID, Quantity, TotalPrice } = billItem;
+
+      const [result] = await db.query("DELETE FROM BillItems WHERE BillItemID = ?", [BillItemID]);
+
+      if (result.affectedRows > 0) {
+        await db.query("UPDATE Bills SET TotalAmount = TotalAmount - ? WHERE BillID = ?", [TotalPrice, billNo]);
+        await db.query("UPDATE Stocks SET Quantity = Quantity + ? WHERE StockID = ?", [Quantity, StockID]);
+
+        return `"${productName}" has been successfully removed from bill ID ${billNo}.`;
+      }
+    }
+    
+    return "Failed to delete the bill item. Please try again.";
   } catch (error) {
     console.error("Error deleting bill item:", error);
     return "An error occurred while deleting the bill item. Please try again.";
   }
 };
+
 
 const getLatestBillItems = async () => {
   try {
