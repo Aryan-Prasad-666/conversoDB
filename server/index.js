@@ -92,6 +92,9 @@ const trainNLPModel = async () => {
 
   // adding new bills 
   manager.addDocument("en", "add a new bill for *");
+  manager.addDocument("en", "add a bill for *");
+  manager.addDocument("en", "save a bill for *");
+  manager.addDocument("en", "add bill for *");
   manager.addDocument("en", "add new bill for *");
   manager.addDocument("en", "save a new bill for", "add.bill");
   manager.addDocument("en", "create a new bill for", "add.bill");
