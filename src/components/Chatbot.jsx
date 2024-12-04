@@ -62,7 +62,7 @@ const Chatbot = () => {
   }
 
   const updatePhone = () => {
-    addChatMessage("bot", "Format: \"update phone for [CustomerName], [NewPhone]\"");
+    addChatMessage("bot", "Format: \"update phone for [CustomerName] to [NewPhone]\"");
   }
 
   const addBill = () =>{
@@ -82,15 +82,11 @@ const Chatbot = () => {
   }
 
   const addStock = () => {
-    addChatMessage("bot", "Format: \"Add stock for [ProductName], [Quantity], [Price]\"");
+    addChatMessage("bot", "Format: \"Add a new stock of [ProductName]\"");
   }
 
   const displayStocks = () => {
     addChatMessage("bot", "To view current stocks just send \"Show me Stocks\" or \"Display stocks\"");
-  }
-
-  const updateStock = () => {
-    addChatMessage("bot", "Format: \"Update stock for [ProductName], [NewQuantity], [NewPrice]\"");
   }
 
   const deleteStock = () => {
@@ -181,7 +177,6 @@ const Chatbot = () => {
             <h3>Stock related Queries:</h3>
             <button onClick={addStock}>Add New Stock</button>
             <button onClick={displayStocks}>Display Stocks</button>
-            <button onClick={updateStock}>Update Stock</button>
             <button onClick={deleteStock}>Delete Stock</button>
             <button onClick={changePrice}>Change Price</button>
             <button onClick={addQuantity}>Add Quantity</button>

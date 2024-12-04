@@ -166,7 +166,9 @@ manager.addAnswer("en", "add.bill", "Please provide the bill details in the form
 
   // Add new stock
   manager.addDocument("en", "add new stock for *", "add.stock");
+  manager.addDocument("en", "add a new stock of *", "add.stock");
   manager.addDocument("en", "add stock for *", "add.stock");
+  manager.addDocument("en", "add stock of *", "add.stock");
 manager.addDocument("en", "add stock for * ", "add.stock");
 manager.addDocument("en", "add new stock for *", "add.stock");
   manager.addDocument("en", "create new stock for *", "add.stock");
@@ -179,15 +181,6 @@ manager.addDocument("en", "add new stock for *", "add.stock");
   manager.addDocument("en", "display all the stocks of shop", "get.stocks");
   manager.addDocument("en", "display stocks", "get.stocks");
   manager.addAnswer("en", "get.stocks", "Fetching stock details...");
-
-  // Update stock
-  manager.addDocument("en", "update stock  for ", "update.stock");
-  manager.addDocument("en", "change stock for ", "update.stock");
-  manager.addDocument("en", "change stock of ", "update.stock");
-  manager.addDocument("en", "update stock of ", "update.stock");
-  manager.addDocument("en", "update stock price of ", "update.stock");
-  manager.addDocument("en", "update stock quantity of ", "update.stock");
-  manager.addAnswer("en", "update.stock", "Updating stock details...");
 
   // Delete stock
   manager.addDocument("en", "delete stock for ", "delete.stock");
@@ -291,8 +284,6 @@ app.post("/chat", async (req, res) => {
       botMessage = await addStock(userMessage);
     }else if(response.intent=== "get.stocks") {
       botMessage = await getStocks();
-    } else if (response.intent === "update.stock") {
-      botMessage = await updateStock(userMessage);
     }else if (response.intent === "delete.stock") {
       botMessage = await deleteStock(userMessage);
     }else if (response.intent === "change.price") {
@@ -547,7 +538,7 @@ const getBills = async () => {
     }
   };
   
-  
+
   // this function is for updating phone number  of a customer
   const updateCustomerPhone = async (userMessage) => {
     try {
@@ -696,47 +687,41 @@ const getBills = async () => {
 
   //stock related functions
 const addStock = async (userMessage) => {
-    try {
-      let sanitizedMessage = userMessage.replace(/\s*comma\s*/gi, ',').replace(/[.!?]/g, '');
-  
-      const match = sanitizedMessage.match(/\b(?:for|of)\s+([\w\s]+?)[,\s]+(\d+)[,\s]+(\d+(\.\d+)?)/i);
-  
-      if (!match) {
-        return "Please provide stock details in the format: Add stock for [ProductName], [Quantity], [Price]";
-      }
-  
-      const [_, productName, quantityRaw, priceRaw] = match;
-      const quantity = parseInt(quantityRaw);
-      const price = parseFloat(priceRaw);
-  
-      if (isNaN(quantity) || isNaN(price)) {
-        return "Quantity and Price must be numeric.";
-      }
+  try {
+    let sanitizedMessage = userMessage.replace(/\s*comma\s*/gi, ',').replace(/[.!?]/g, '');
+    const match = sanitizedMessage.match(/\b(?:for|of)\s+([\w\s]+)/i);
 
-      const [existingProduct] = await db.query(
-        `SELECT * FROM Stocks WHERE ProductName = ?`,
-        [productName.trim()]
+    if (!match) {
+      return "Please provide the product name in the format: Add a new stock of [ProductName]";
+    }
+
+    const [_, productName] = match;
+
+    const [existingProduct] = await db.query(
+      `SELECT * FROM Stocks WHERE ProductName = ?`,
+      [productName.trim()]
     );
 
     if (existingProduct.length > 0) {
-        return `The product "${productName}" is already present in the stock. Use update stock if you want to update quantity or price`;
+      return `The product "${productName}" is already present in the stock. Use update stock if you want to update quantity or price.`;
     }
-  
-      const [result] = await db.query(
-        `INSERT INTO Stocks (ProductName, Quantity, Price) VALUES (?, ?, ?)`,
-        [productName.trim(), quantity, price]
-      );
-  
-      if (result.affectedRows > 0) {
-        return `New stock added successfully! Product: ${productName}`;
-      } else {
-        return "Failed to add the stock. Please try again.";
-      }
-    } catch (error) {
-      console.error("Error adding stock:", error);
-      return "An error occurred while adding the stock. Please try again.";
+
+    const [result] = await db.query(
+      `INSERT INTO Stocks (ProductName, Quantity, Price) VALUES (?, 0, 0)`,
+      [productName.trim()]
+    );
+
+    if (result.affectedRows > 0) {
+      return `New stock added successfully! Product: ${productName}`;
+    } else {
+      return "Failed to add the stock. Please try again.";
+    }
+  } catch (error) {
+    console.error("Error adding stock:", error);
+    return "An error occurred while adding the stock. Please try again.";
   }
 };
+
 
 const getStocks = async () => {
   try {
