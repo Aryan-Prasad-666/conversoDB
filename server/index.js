@@ -165,12 +165,11 @@ manager.addAnswer("en", "add.bill", "Please provide the bill details in the form
   manager.addAnswer("en", "delete.bill", "Deleting the bill...");
 
   // Add new stock
-  manager.addDocument("en", "add stock for ", "add.stock");
-  manager.addDocument("en", "add stock for pens", "add.stock");
-manager.addDocument("en", "add stock for items", "add.stock");
-manager.addDocument("en", "add stock for {item}", "add.stock");
-manager.addDocument("en", "add a new batch of {item}","add.stock");
-  manager.addDocument("en", "create new stock for ", "add.stock");
+  manager.addDocument("en", "add new stock for *", "add.stock");
+  manager.addDocument("en", "add stock for *", "add.stock");
+manager.addDocument("en", "add stock for * ", "add.stock");
+manager.addDocument("en", "add new stock for *", "add.stock");
+  manager.addDocument("en", "create new stock for *", "add.stock");
   manager.addAnswer("en", "add.stock", "Please provide stock details in the format: [ProductName], [Quantity], [Price]");
 
   // Display stock
@@ -436,8 +435,7 @@ const getBills = async () => {
       let sanitizedMessage = userMessage.replace(/\s*comma\s*/gi, ',');  
       sanitizedMessage = sanitizedMessage.replace(/[.!?-]/g, '');  
 
-      const match = sanitizedMessage.match(/customer\s+([A-Za-z\s]+)(?:,\s*|\s+)(\d+)/i);
-
+      const match = sanitizedMessage.match(/customer\s+([A-Za-z\s]+)(?:,\s*|\s+)(\d[\d\s]*)/i);
       if (!match) {
         return "Please provide the customer details in the format: Add a customer [CustomerName], [Phone].";
       }
@@ -549,8 +547,7 @@ const getBills = async () => {
     }
   };
   
-
-
+  
   // this function is for updating phone number  of a customer
   const updateCustomerPhone = async (userMessage) => {
     try {
