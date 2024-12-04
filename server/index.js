@@ -127,9 +127,14 @@ manager.addAnswer("en", "add.bill", "Please provide the bill details in the form
   manager.addAnswer("en", "get.customer", "Fetching customer details...");
 
   // to add  new customer
-  manager.addDocument("en", "add a new customer", "add.customer");
-  manager.addDocument("en", "create a new customer", "add.customer");
-  manager.addDocument("en", "save customer details", "add.customer");
+  manager.addDocument("en", "add a new customer * *", "add.customer");
+  manager.addDocument("en", "create new customer * *", "add.customer");
+  manager.addDocument("en", "save a new customer * *", "add.customer");
+  manager.addDocument("en", "add new customer * *", "add.customer");
+  manager.addDocument("en", "add customer * *", "add.customer");
+  manager.addDocument("en", "create customer * *", "add.customer");
+  manager.addDocument("en", "create a new customer * *", "add.customer");
+  manager.addDocument("en", "save customer details * *", "add.customer");
   manager.addAnswer("en", "add.customer", "Please provide the customer details in the format: [CustomerName], [Phone]");
 
   // to update phone
@@ -431,7 +436,7 @@ const getBills = async () => {
       let sanitizedMessage = userMessage.replace(/\s*comma\s*/gi, ',');  
       sanitizedMessage = sanitizedMessage.replace(/[.!?-]/g, '');  
 
-      const match = sanitizedMessage.match(/customer\s+([A-Za-z\s]+)(?:,\s*|\s+)(\d{10,15})/i);
+      const match = sanitizedMessage.match(/customer\s+([A-Za-z\s]+)(?:,\s*|\s+)(\d+)/i);
 
       if (!match) {
         return "Please provide the customer details in the format: Add a customer [CustomerName], [Phone].";
