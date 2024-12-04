@@ -54,7 +54,7 @@ const Chatbot = () => {
   };
 
   const addCustomer = () => {
-    addChatMessage("bot", "Format: \"Add a new customer: [CustomerName], [Phone]\"");
+    addChatMessage("bot", "Format: \"Add a new customer [CustomerName].\"");
   }
 
   const displayCustomers = () => {

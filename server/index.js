@@ -127,14 +127,14 @@ manager.addAnswer("en", "add.bill", "Please provide the bill details in the form
   manager.addAnswer("en", "get.customer", "Fetching customer details...");
 
   // to add  new customer
-  manager.addDocument("en", "add a new customer * *", "add.customer");
-  manager.addDocument("en", "create new customer * *", "add.customer");
-  manager.addDocument("en", "save a new customer * *", "add.customer");
-  manager.addDocument("en", "add new customer * *", "add.customer");
-  manager.addDocument("en", "add customer * *", "add.customer");
-  manager.addDocument("en", "create customer * *", "add.customer");
-  manager.addDocument("en", "create a new customer * *", "add.customer");
-  manager.addDocument("en", "save customer details * *", "add.customer");
+  manager.addDocument("en", "add a new customer *", "add.customer");
+  manager.addDocument("en", "create new customer *", "add.customer");
+  manager.addDocument("en", "save a new customer *", "add.customer");
+  manager.addDocument("en", "add new customer *", "add.customer");
+  manager.addDocument("en", "add customer *", "add.customer");
+  manager.addDocument("en", "create customer *", "add.customer");
+  manager.addDocument("en", "create a new customer *", "add.customer");
+  manager.addDocument("en", "save customer details *", "add.customer");
   manager.addAnswer("en", "add.customer", "Please provide the customer details in the format: [CustomerName], [Phone]");
 
   // to update phone
@@ -423,45 +423,47 @@ const getBills = async () => {
   // this function is to add new customers
   const addCustomer = async (userMessage) => {
     try {
-      let sanitizedMessage = userMessage.replace(/\s*comma\s*/gi, ',');  
-      sanitizedMessage = sanitizedMessage.replace(/[.!?-]/g, '');  
+        let sanitizedMessage = userMessage.replace(/\s*comma\s*/gi, ',');
+        sanitizedMessage = sanitizedMessage.replace(/[,.!?-]/g, '');
+        const match = sanitizedMessage.match(/customer\s+([A-Za-z\s]+)/i);
+        if (!match) {
+            return "Please provide the customer details in the format: Add a customer [CustomerName].";
+        }
 
-      const match = sanitizedMessage.match(/customer\s+([A-Za-z\s]+)(?:,\s*|\s+)(\d[\d\s]*)/i);
-      if (!match) {
-        return "Please provide the customer details in the format: Add a customer [CustomerName], [Phone].";
-      }
+        const [_, customerName] = match;
 
-      const [_, customerName, phone] = match;
+        const [existingCustomer] = await db.query(
+            "SELECT CustomerID FROM Customers WHERE Name = ? LIMIT 1",
+            [customerName.trim()]
+        );
 
-      const [existingCustomer] = await db.query(
-        "SELECT CustomerID FROM Customers WHERE Name = ? LIMIT 1",
-        [customerName.trim()]
-      );
+        if (existingCustomer.length > 0) {
+            return `Customer already exists with Customer ID: ${existingCustomer[0].CustomerID}`;
+        }
 
-      if (existingCustomer.length > 0) {
-        return `Customer already exists with Customer ID: ${existingCustomer[0].CustomerID}`;
-      }
+        const [result] = await db.query(
+            `INSERT INTO Customers (Name, Phone) VALUES (?, ?)`,
+            [customerName.trim(), null]
+        );
 
-      const [result] = await db.query(
-        `INSERT INTO Customers (Name, Phone) VALUES (?, ?)`,
-        [customerName.trim(), phone.trim()]
-      );
-
-      if (result.affectedRows > 0) {
-        return `New customer added successfully! Customer Name: ${customerName}`;
-      } else {
-        return "Failed to add the customer. Please try again.";
-      }
+        if (result.affectedRows > 0) {
+            return `New customer added successfully! Customer Name: ${customerName}`;
+        } else {
+            return "Failed to add the customer. Please try again.";
+        }
     } catch (error) {
-      console.error("Error adding customer:", error);
-      return "An error occurred while adding the customer. Please try again.";
+        console.error("Error adding customer:", error);
+        return "An error occurred while adding the customer. Please try again.";
     }
-  };
+};
+
 
   // this function is to display customer's details
   const getCustomerDetails = async (userMessage) => {
     try {
-      const match = userMessage.match(/(?:of|for)\s+([A-Za-z\s]+)$/i);
+      let sanitizedMessage = userMessage.replace(/\s*comma\s*/gi, ',');
+      sanitizedMessage = sanitizedMessage.replace(/[,.!?-]/g, '');
+      const match = sanitizedMessage.match(/(?:of|for)\s+([A-Za-z\s]+)$/i);
       if (!match) {
         return "Please specify a valid customer name.";
       }

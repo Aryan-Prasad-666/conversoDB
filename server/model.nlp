@@ -625,42 +625,42 @@
           },
           {
             "domain": "default",
-            "utterance": "add a new customer * *",
+            "utterance": "add a new customer *",
             "intent": "add.customer"
           },
           {
             "domain": "default",
-            "utterance": "create new customer * *",
+            "utterance": "create new customer *",
             "intent": "add.customer"
           },
           {
             "domain": "default",
-            "utterance": "save a new customer * *",
+            "utterance": "save a new customer *",
             "intent": "add.customer"
           },
           {
             "domain": "default",
-            "utterance": "add new customer * *",
+            "utterance": "add new customer *",
             "intent": "add.customer"
           },
           {
             "domain": "default",
-            "utterance": "add customer * *",
+            "utterance": "add customer *",
             "intent": "add.customer"
           },
           {
             "domain": "default",
-            "utterance": "create customer * *",
+            "utterance": "create customer *",
             "intent": "add.customer"
           },
           {
             "domain": "default",
-            "utterance": "create a new customer * *",
+            "utterance": "create a new customer *",
             "intent": "add.customer"
           },
           {
             "domain": "default",
-            "utterance": "save customer details * *",
+            "utterance": "save customer details *",
             "intent": "add.customer"
           },
           {
@@ -3325,35 +3325,35 @@
       ],
       [
         "en",
-        "add a new customer * *"
+        "add a new customer *"
       ],
       [
         "en",
-        "create new customer * *"
+        "create new customer *"
       ],
       [
         "en",
-        "save a new customer * *"
+        "save a new customer *"
       ],
       [
         "en",
-        "add new customer * *"
+        "add new customer *"
       ],
       [
         "en",
-        "add customer * *"
+        "add customer *"
       ],
       [
         "en",
-        "create customer * *"
+        "create customer *"
       ],
       [
         "en",
-        "create a new customer * *"
+        "create a new customer *"
       ],
       [
         "en",
-        "save customer details * *"
+        "save customer details *"
       ],
       [
         "en",
