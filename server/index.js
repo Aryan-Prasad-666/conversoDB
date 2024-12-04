@@ -547,7 +547,7 @@ const getBills = async () => {
       let sanitizedMessage = userMessage.replace(/\s*comma\s*/gi, ',');  
       sanitizedMessage = sanitizedMessage.replace(/[.!?-]/g, '');  
 
-      const match = sanitizedMessage.match(/(?:for|of)\s+([A-Za-z\s]+?)(?:,\s*|\s+|\s*to\s+)(\d{10,15})/i);
+      const match = sanitizedMessage.match(/(?:for|of)\s+([A-Za-z\s]+?)(?:,\s*|\s+|\s*to\s+)(\d+)/i);
 
       if (!match) {
         return "Please provide the details in the format: Update phone of [CustomerName] to [NewPhone].";
