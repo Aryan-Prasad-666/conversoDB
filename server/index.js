@@ -767,39 +767,6 @@ const getStocks = async () => {
   }
 };
 
-const updateStock = async (userMessage) => {
-  try {
-    let sanitizedMessage = userMessage.replace(/\s*comma\s*/gi, ',').replace(/[.!?-]/g, '');
-
-    const match = sanitizedMessage.match(/\b(?:for|of)\s+([\w\s]+?)[,\s]+(\d+)[,\s]+(\d+(\.\d+)?)/i);
-
-    if (!match) {
-      return "Please provide the details in the format: Update stock for [ProductName], [NewQuantity], [NewPrice].";
-    }
-
-    const [_, productName, quantityRaw, priceRaw] = match;
-    const quantity = parseInt(quantityRaw);
-    const price = parseFloat(priceRaw);
-
-    if (isNaN(quantity) || isNaN(price)) {
-      return "Quantity and Price must be numeric.";
-    }
-
-    const [result] = await db.query(
-      `UPDATE Stocks SET Quantity = ?, Price = ? WHERE ProductName = ?`,
-      [quantity, price, productName.trim()]
-    );
-
-    if (result.affectedRows > 0) {
-      return `Stock updated successfully for ${productName}.`;
-    } else {
-      return `No stock found for ${productName}. Please check the product name and try again.`;
-    }
-  } catch (error) {
-    console.error("Error updating stock:", error);
-    return "An error occurred while updating the stock. Please try again.";
-  }
-};
 
 const deleteStock = async (userMessage) => {
   try {
@@ -872,7 +839,7 @@ const changePrice = async (userMessage) => {
 
 const addQuantity = async (userMessage) => {
   try {
-    let sanitizedMessage = userMessage.replace(/\s*comma\s*/gi, ',').replace(/[.!?]/g, '');
+    let sanitizedMessage = userMessage.replace(/\s*comma\s*/gi, ',').replace(/[/:;.!?]/g, '');
 
     const match = sanitizedMessage.match(/\b(?:for|of)\s+([\w\s]+?)\s*(?:by)?\s*(\d+(\.\d+)?)/i);
   
