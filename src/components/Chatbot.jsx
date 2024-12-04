@@ -163,10 +163,6 @@ const Chatbot = () => {
   return (
     <div className="chatbot">
       <Navbar />
-      <header className="chatbot-header">
-        <h1>Chat with conversoDB</h1>
-      </header>
-
       <div className="chatbot-body">
         <div className="buttons-container">
           <div className="options-panel">
