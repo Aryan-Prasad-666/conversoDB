@@ -541,7 +541,6 @@ const getBills = async () => {
   };
   
 
-  // this function is for updating phone number  of a customer
   const updateCustomerPhone = async (userMessage) => {
     try {
       let sanitizedMessage = userMessage.replace(/\s*comma\s*/gi, ',');  
@@ -687,7 +686,6 @@ const getBills = async () => {
   };
 
 
-  //stock related functions
 const addStock = async (userMessage) => {
   try {
     let sanitizedMessage = userMessage.replace(/\s*comma\s*/gi, ',').replace(/[.!?]/g, '');
@@ -958,7 +956,6 @@ const deleteBillItem = async (userMessage) => {
       return "Invalid bill ID. Please provide a valid number for the bill ID.";
     }
 
-    // Ensure we extract the correct results
     const [billItems] = await db.query(
       `
       SELECT 

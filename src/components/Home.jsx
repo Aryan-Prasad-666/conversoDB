@@ -19,7 +19,7 @@ const Home = () => {
         {/* <Spline scene="https://prod.spline.design/xz5okzxw3erJedlW/scene.splinecode" />  */}
         {/* <Spline scene="https://prod.spline.design/Dpz2rOssjllsgyvh/scene.splinecode" /> */}
         {/* <Spline scene="https://prod.spline.design/9zQFgSv8q1Evf0WS/scene.splinecode" /> */}
-        <Spline scene="https://prod.spline.design/oR8PwXXParsI1BxN/scene.splinecode" />
+        {/* <Spline scene="https://prod.spline.design/oR8PwXXParsI1BxN/scene.splinecode" /> */}
       </div>
       
       <footer className="footer">
